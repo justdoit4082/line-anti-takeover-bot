@@ -9,6 +9,17 @@ from src.models.group import db
 from src.routes.webhook import webhook_bp
 from src.routes.admin import admin_bp
 
+from flask import Flask, send_from_directory
+from flask_cors import CORS
+from src.routes.webhook import webhook_bp  # ✅
+
+app = Flask(__name__)
+CORS(app)
+
+# ✅ 註冊 webhook 路由
+app.register_blueprint(webhook_bp, url_prefix='/')
+
+
 app = Flask(__name__, static_folder=os.path.join(os.path.dirname(__file__), 'static'))
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'line-anti-takeover-bot-secret-key')
 
