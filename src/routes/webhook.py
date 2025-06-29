@@ -1,6 +1,7 @@
+# 整合 webhook 完整腳本，包含 handle_message、join/leave event 等功能
+complete_webhook_code = """
 import os
 import json
-import time
 from flask import Blueprint, request, abort, jsonify
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
@@ -27,10 +28,9 @@ else:
 
 @webhook_bp.route("/webhook", methods=['POST'])
 def webhook():
-    # 驗證簽名
     signature = request.headers.get('X-Line-Signature')
-
     body = request.get_data(as_text=True)
+
     try:
         if not handler:
             return jsonify({'error': 'Bot not configured properly.'}), 500
@@ -42,38 +42,69 @@ def webhook():
 
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
+    import os
+
     user_id = event.source.user_id
     group_id = getattr(event.source, 'group_id', None)
+    user_message = event.message.text.strip()
+print(f"[DEBUG] user_id: {user_id}, group_id: {group_id}, message: {user_message}")
 
-    # 如果沒有 group_id，代表是個人聊天，不處理
+    print(f"[DEBUG] user_id: {user_id}, group_id: {group_id}, message: {user_message}")
+
+    group_admins = ['請填入你的 userId，例如 U123xxx']
+
     if not group_id:
+        reply_text_message(line_bot_api, event.reply_token, "請在群組中使用此機器人功能。")
         return
 
-    user_message = event.message.text
-    print(f"來自群組 {group_id} 的訊息：{user_message}")
-
-    # 指令：/help
     if user_message.lower() == "/help":
         help_text = (
-            "🤖 機器人功能指令清單：\n"
-            "🛡 /warn [@使用者]：發出警告\n"
-            "👑 /admin：查詢群組管理員\n"
-            "📋 /log：檢查踢人紀錄\n"
-            "🚫 /banlist：查看封鎖名單\n"
+            "🤖 機器人功能指令清單：\\n"
+            "🛡 /warn [@使用者]：發出警告\\n"
+            "👑 /admin：查詢群組管理員\\n"
+            "📋 /log：檢查警告紀錄\\n"
+            "🚫 /banlist：查看封鎖名單\\n"
             "📖 /help：顯示此說明列表"
         )
-        line_bot_api.reply_message(
-            event.reply_token,
-            TextSendMessage(text=help_text)
-        )
+        reply_text_message(line_bot_api, event.reply_token, help_text)
         return
 
-    # 如果不是指令，就回覆原本的話
+    if user_message.lower() == "/admin":
+        reply_text_message(line_bot_api, event.reply_token, f"👑 管理員 ID：\\n" + "\\n".join(group_admins))
+        return
+
+    if user_message.lower().startswith("/warn"):
+        if is_user_group_admin(user_id, group_admins):
+            create_event_log("warn", user_id, group_id, user_message)
+            reply_text_message(line_bot_api, event.reply_token, "⚠️ 已記錄警告。")
+        else:
+            reply_text_message(line_bot_api, event.reply_token, "❌ 你不是管理員，不能使用 /warn 指令。")
+        return
+
+    if user_message.lower() == "/log":
+        log_file = f"logs/{group_id}_warn.log"
+        if os.path.exists(log_file):
+            with open(log_file, "r", encoding="utf-8") as f:
+                lines = f.readlines()[-5:]
+            log_text = "📋 最新警告紀錄：\\n" + "".join(lines)
+        else:
+            log_text = "📋 尚無任何警告紀錄。"
+        reply_text_message(line_bot_api, event.reply_token, log_text)
+        return
+
+    if user_message.lower() == "/banlist":
+        banlist_file = "banlist.txt"
+        if os.path.exists(banlist_file):
+            with open(banlist_file, "r", encoding="utf-8") as f:
+                users = f.read().strip()
+            ban_text = "🚫 封鎖名單如下：\\n" + users if users else "🚫 封鎖名單為空。"
+        else:
+            ban_text = "🚫 尚未建立封鎖名單。"
+        reply_text_message(line_bot_api, event.reply_token, ban_text)
+        return
+
     reply_text = f"你說的是：{user_message}"
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text=reply_text)
-    )
+    reply_text_message(line_bot_api, event.reply_token, reply_text)
 
 @handler.add(JoinEvent)
 @handler.add(FollowEvent)
@@ -83,7 +114,7 @@ def handle_join(event):
     group_id = getattr(event.source, 'group_id', None)
     print(f"加入事件：user_id={user_id}, group_id={group_id}")
 
-    welcome_text = "感謝加入，這是一個防踢群機器人。"
+    welcome_text = "感謝加入，這是一個防踢群機器人。輸入 /help 查看功能列表。"
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text=welcome_text)
@@ -96,23 +127,7 @@ def handle_leave(event):
     user_id = event.source.user_id
     group_id = getattr(event.source, 'group_id', None)
     print(f"離開事件：user_id={user_id}, group_id={group_id}")
-    # 可選擇寫入離開記錄等
+"""
 
-# ✅ 新增測試 webhook 接收事件用的端點（LINE 驗證 200 回應）
-@webhook_bp.route('/webhook-test', methods=['POST'])
-def webhook_test():
-    try:
-        payload = request.get_json(force=True, silent=True)
-        if payload is None:
-            return jsonify({'status': 'no payload'}), 400
-
-        events = payload.get('events', [])
-        results = []
-
-        for event in events:
-            results.append({'status': 'event received'})
-
-        return jsonify(results), 200
-
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+with open("/mnt/data/full_webhook_script.py", "w", encoding="utf-8") as f:
+    f.write(complete_webhook_code.strip())
