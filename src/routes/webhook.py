@@ -9,7 +9,8 @@ webhook_bp = Blueprint("webhook", __name__)
 
 line_bot_api = LineBotApi(os.getenv("LINE_CHANNEL_ACCESS_TOKEN"))
 handler = WebhookHandler(os.getenv("LINE_CHANNEL_SECRET"))
-ADMIN_USER_ID = os.getenv("ADMIN_USER_ID")
+
+ADMIN_USER_IDS = ["U27bdcfedc1a0d11770345793882688c6"]  # 若有多位可擴充為多筆
 
 LOG_DIR = "./logs"
 os.makedirs(LOG_DIR, exist_ok=True)
@@ -63,5 +64,14 @@ def handle_member_left(event):
             log_path = f"{LOG_DIR}/{group_id}_warn.log"
             with open(log_path, "a", encoding="utf-8") as log:
                 log.write(f"🚨 成員離開偵測：{datetime.now().isoformat()} - {left_user_id}\n")
+
+            # 推播通知管理員
+            for admin_id in ADMIN_USER_IDS:
+                try:
+                    line_bot_api.push_message(admin_id, TextSendMessage(
+                        text=f"⚠️ 有成員從群組 {group_id} 離開或被踢出：\n{left_user_id}"
+                    ))
+                except Exception as e:
+                    print(f"通知失敗: {e}")
     except Exception as e:
         print(f"處理成員離開事件時出錯：{e}")
