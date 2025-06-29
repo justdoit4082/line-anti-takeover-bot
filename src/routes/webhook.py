@@ -1,10 +1,12 @@
+from kick_guard_module import handle_member_left
+
 import os
 import json
 import time
 from flask import Blueprint, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
-from linebot.models import MessageEvent, TextMessage, TextSendMessage, JoinEvent, LeaveEvent, UnfollowEvent
+from linebot.models import MemberLeftEvent, MessageEvent, TextMessage, TextSendMessage, JoinEvent, LeaveEvent, UnfollowEvent
 
 webhook_bp = Blueprint('webhook', __name__)
 
@@ -14,7 +16,7 @@ channel_access_token = os.getenv('LINE_CHANNEL_ACCESS_TOKEN')
 handler = WebhookHandler(channel_secret)
 line_bot_api = LineBotApi(channel_access_token)
 
-# 管理員 userId（輸入我的U-ID）
+# 管理員 userId（請替換成你自己的）
 ADMIN_USER_ID = 'U27bdcfedc1a0d11770345793882688c6'
 
 # 建立所需資料夾
@@ -107,3 +109,7 @@ def extract_mention_id(event):
     except:
         return None
     return None
+
+@handler.add(MemberLeftEvent)
+def on_member_left(event):
+    handle_member_left(event)
