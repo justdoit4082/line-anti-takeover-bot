@@ -9,8 +9,7 @@ webhook_bp = Blueprint("webhook", __name__)
 
 line_bot_api = LineBotApi(os.getenv("LINE_CHANNEL_ACCESS_TOKEN"))
 handler = WebhookHandler(os.getenv("LINE_CHANNEL_SECRET"))
-ADMIN_USER_ID = os.getenv("ADMIN_USER_ID")
-ADMIN_USER_IDS = [ADMIN_USER_ID]  # 若有多位可擴充為多筆
+ADMIN_USER_IDS = ["U27bdcfedc1a0d11770345793882688c6"]  # 若有多位可擴充為多筆
 
 LOG_DIR = "./logs"
 os.makedirs(LOG_DIR, exist_ok=True)
