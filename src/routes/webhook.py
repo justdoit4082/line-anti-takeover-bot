@@ -61,6 +61,7 @@ def handle_message(event):
             "👑 /admin：查詢群組管理員\n"
             "📋 /log：檢查警告紀錄\n"
             "🚫 /banlist：查看封鎖名單\n"
+            "🆔 /myid：查詢你自己的 user_id\n"
             "📖 /help：顯示此說明列表"
         )
         reply_text_message(line_bot_api, event.reply_token, help_text)
@@ -68,6 +69,10 @@ def handle_message(event):
 
     if user_message.lower() == "/admin":
         reply_text_message(line_bot_api, event.reply_token, f"👑 管理員 ID：\n" + "\n".join(group_admins))
+        return
+
+    if user_message.lower() == "/myid":
+        reply_text_message(line_bot_api, event.reply_token, f"你的 user_id 是：{user_id}")
         return
 
     if user_message.lower().startswith("/warn"):
