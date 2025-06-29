@@ -10,7 +10,7 @@ from linebot.models import (
 )
 # from src.utils.check_admin import is_user_group_admin
 # from src.utils.create_log import create_event_log
-from src.utils.reply_message import reply_text_message
+# from src.utils.reply_message import reply_text_message
 
 webhook_bp = Blueprint('webhook', __name__)
 
