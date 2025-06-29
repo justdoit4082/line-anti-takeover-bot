@@ -48,7 +48,7 @@ def handle_message(event):
 
     print(f"[DEBUG] user_id: {user_id}, group_id: {group_id}, message: {user_message}")
 
-    group_admins = ['請填入你的 userId，例如 U123xxx']
+    group_admins = ['U27bdcfedc1a0d11770345793882688c6']
 
     if not group_id:
         reply_text_message(line_bot_api, event.reply_token, "請在群組中使用此機器人功能。")
