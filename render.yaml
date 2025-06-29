@@ -1,0 +1,19 @@
+services:
+  - type: web
+    name: line-anti-takeover-bot
+    env: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: python src/main.py
+    envVars:
+      - key: FLASK_ENV
+        value: production
+      - key: LINE_CHANNEL_ACCESS_TOKEN
+        sync: false
+      - key: LINE_CHANNEL_SECRET
+        sync: false
+      - key: SECRET_KEY
+        generateValue: true
+    healthCheckPath: /
+    autoDeploy: true
+
