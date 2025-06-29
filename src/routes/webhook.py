@@ -105,8 +105,8 @@ def handle_message(event):
         reply_text_message(line_bot_api, event.reply_token, ban_text)
         return
 
-    reply_text = f"你說的是：{user_message}"
-    reply_text_message(line_bot_api, event.reply_token, reply_text)
+    # reply_text = f"你說的是：{user_message}"
+    # reply_text_message(line_bot_api, event.reply_token, reply_text)
 
 @handler.add(JoinEvent)
 @handler.add(FollowEvent)
