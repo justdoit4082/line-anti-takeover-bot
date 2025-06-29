@@ -49,10 +49,27 @@ def handle_message(event):
     if not group_id:
         return
 
-    text = event.message.text
-    print(f"來自群組 {group_id} 的訊息：{text}")
+    user_message = event.message.text
+    print(f"來自群組 {group_id} 的訊息：{user_message}")
 
-    reply_text = f"你說的是：{text}"
+    # 指令：/help
+    if user_message.lower() == "/help":
+        help_text = (
+            "🤖 機器人功能指令清單：\n"
+            "🛡 /warn [@使用者]：發出警告\n"
+            "👑 /admin：查詢群組管理員\n"
+            "📋 /log：檢查踢人紀錄\n"
+            "🚫 /banlist：查看封鎖名單\n"
+            "📖 /help：顯示此說明列表"
+        )
+        line_bot_api.reply_message(
+            event.reply_token,
+            TextSendMessage(text=help_text)
+        )
+        return
+
+    # 如果不是指令，就回覆原本的話
+    reply_text = f"你說的是：{user_message}"
     line_bot_api.reply_message(
         event.reply_token,
         TextSendMessage(text=reply_text)
