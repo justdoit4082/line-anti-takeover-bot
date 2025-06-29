@@ -8,7 +8,7 @@ from linebot.models import (
     MessageEvent, TextMessage, TextSendMessage, JoinEvent, FollowEvent,
     MemberJoinedEvent, MemberLeftEvent, UnfollowEvent, LeaveEvent
 )
-from src.utils.check_admin import is_user_group_admin
+# from src.utils.check_admin import is_user_group_admin
 from src.utils.create_log import create_event_log
 from src.utils.reply_message import reply_text_message
 
