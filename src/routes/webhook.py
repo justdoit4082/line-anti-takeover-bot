@@ -45,6 +45,12 @@ def handle_message(event):
     user_id = event.source.user_id
     group_id = getattr(event.source, 'group_id', None)
 
+    # ✅ 在這裡印出你的 user_id
+    print(f"[DEBUG] 使用者 user_id：{user_id}")
+
+    if not group_id:
+        return
+
     # 如果沒有 group_id，代表是個人聊天，不處理
     if not group_id:
         return
