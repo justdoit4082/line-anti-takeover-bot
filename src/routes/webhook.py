@@ -45,13 +45,6 @@ def handle_message(event):
     user_id = event.source.user_id
     group_id = getattr(event.source, 'group_id', None)
 
-if user_message.lower() == "/myid":
-    line_bot_api.reply_message(
-        event.reply_token,
-        TextSendMessage(text=f"你的 userId 是：{華藏}")
-    )
-    return
-
     # 如果沒有 group_id，代表是個人聊天，不處理
     if not group_id:
         return
