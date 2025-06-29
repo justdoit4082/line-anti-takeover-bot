@@ -1,5 +1,3 @@
-# 整合 webhook 完整腳本，包含 handle_message、join/leave event 等功能
-complete_webhook_code = """
 import os
 import json
 from flask import Blueprint, request, abort, jsonify
@@ -47,7 +45,6 @@ def handle_message(event):
     user_id = event.source.user_id
     group_id = getattr(event.source, 'group_id', None)
     user_message = event.message.text.strip()
-print(f"[DEBUG] user_id: {user_id}, group_id: {group_id}, message: {user_message}")
 
     print(f"[DEBUG] user_id: {user_id}, group_id: {group_id}, message: {user_message}")
 
@@ -59,18 +56,18 @@ print(f"[DEBUG] user_id: {user_id}, group_id: {group_id}, message: {user_message
 
     if user_message.lower() == "/help":
         help_text = (
-            "🤖 機器人功能指令清單：\\n"
-            "🛡 /warn [@使用者]：發出警告\\n"
-            "👑 /admin：查詢群組管理員\\n"
-            "📋 /log：檢查警告紀錄\\n"
-            "🚫 /banlist：查看封鎖名單\\n"
+            "🤖 機器人功能指令清單：\n"
+            "🛡 /warn [@使用者]：發出警告\n"
+            "👑 /admin：查詢群組管理員\n"
+            "📋 /log：檢查警告紀錄\n"
+            "🚫 /banlist：查看封鎖名單\n"
             "📖 /help：顯示此說明列表"
         )
         reply_text_message(line_bot_api, event.reply_token, help_text)
         return
 
     if user_message.lower() == "/admin":
-        reply_text_message(line_bot_api, event.reply_token, f"👑 管理員 ID：\\n" + "\\n".join(group_admins))
+        reply_text_message(line_bot_api, event.reply_token, f"👑 管理員 ID：\n" + "\n".join(group_admins))
         return
 
     if user_message.lower().startswith("/warn"):
@@ -86,7 +83,7 @@ print(f"[DEBUG] user_id: {user_id}, group_id: {group_id}, message: {user_message
         if os.path.exists(log_file):
             with open(log_file, "r", encoding="utf-8") as f:
                 lines = f.readlines()[-5:]
-            log_text = "📋 最新警告紀錄：\\n" + "".join(lines)
+            log_text = "📋 最新警告紀錄：\n" + "".join(lines)
         else:
             log_text = "📋 尚無任何警告紀錄。"
         reply_text_message(line_bot_api, event.reply_token, log_text)
@@ -97,7 +94,7 @@ print(f"[DEBUG] user_id: {user_id}, group_id: {group_id}, message: {user_message
         if os.path.exists(banlist_file):
             with open(banlist_file, "r", encoding="utf-8") as f:
                 users = f.read().strip()
-            ban_text = "🚫 封鎖名單如下：\\n" + users if users else "🚫 封鎖名單為空。"
+            ban_text = "🚫 封鎖名單如下：\n" + users if users else "🚫 封鎖名單為空。"
         else:
             ban_text = "🚫 尚未建立封鎖名單。"
         reply_text_message(line_bot_api, event.reply_token, ban_text)
@@ -127,7 +124,3 @@ def handle_leave(event):
     user_id = event.source.user_id
     group_id = getattr(event.source, 'group_id', None)
     print(f"離開事件：user_id={user_id}, group_id={group_id}")
-"""
-
-with open("/mnt/data/full_webhook_script.py", "w", encoding="utf-8") as f:
-    f.write(complete_webhook_code.strip())
