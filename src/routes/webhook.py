@@ -36,8 +36,19 @@ anti_takeover_service = AntiTakeoverService(line_bot_api)
 @webhook_bp.route('/webhook', methods=['POST'])
 def webhook():
     """LINE Webhook端點"""
-    if not handler:
-        return jsonify({'error': 'Bot not configured properly. Please set LINE_CHANNEL_ACCESS_TOKEN and LINE_CHANNEL_SECRET environment variables.'}), 500
+if not handler:
+    payload = request.get_json(force=True, silent=True)
+    if payload is None:
+        return jsonify({'status': 'no payload'}), 400
+
+    events = payload.get('events', [])
+    results = []
+
+    for event in events:
+        results.append({'status': 'event received'})
+
+    return jsonify(results), 200
+
     
     # 取得X-Line-Signature header value
     signature = request.headers.get('X-Line-Signature')
