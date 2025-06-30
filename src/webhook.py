@@ -1,20 +1,20 @@
-import os 
+import os  
 from flask import Blueprint, request, abort
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage, MemberLeftEvent
 from datetime import datetime
 
-webhook_bp = Blueprint("webhook", __name__)
+webhook_bp = Blueprint("webhook", __name__)  # ✅ 只保留這一個 blueprint 宣告
 
 line_bot_api = LineBotApi(os.getenv("LINE_CHANNEL_ACCESS_TOKEN"))
 handler = WebhookHandler(os.getenv("LINE_CHANNEL_SECRET"))
-ADMIN_USER_IDS = ["U27bdcfedc1a0d11770345793882688c6"]  # 若有多位可擴充為多筆
+ADMIN_USER_IDS = ["U27bdcfedc1a0d11770345793882688c6"]
 
 LOG_DIR = "./logs"
 os.makedirs(LOG_DIR, exist_ok=True)
 
-@webhook_bp.route("/callback", methods=["POST"])
+@webhook_bp.route("/callback", methods=["POST"])  # ✅ 正確路由
 def callback():
     signature = request.headers.get("X-Line-Signature")
     body = request.get_data(as_text=True)
@@ -36,7 +36,7 @@ def handle_message(event):
 
         if text == "/myid":
             line_bot_api.reply_message(event.reply_token, TextSendMessage(text=f"你的ID是：{user_id}"))
-        elif text == "/warn" and user_id == ADMIN_USER_ID:
+        elif text == "/warn" and user_id in ADMIN_USER_IDS:
             log_path = f"{LOG_DIR}/{group_id}_warn.log"
             with open(log_path, "a", encoding="utf-8") as log:
                 log.write(f"⚠️ 管理員警告：{datetime.now().isoformat()} - 由 {user_id} 發出\n")
@@ -73,11 +73,3 @@ def handle_member_left(event):
                     print(f"通知失敗: {e}")
     except Exception as e:
         print(f"處理成員離開事件時出錯：{e}")
-
-from flask import Blueprint, request
-
-webhook_bp = Blueprint("webhook", __name__)
-
-@webhook_bp.route("/callback", methods=["POST"])
-def webhook():
-    return "OK", 200
