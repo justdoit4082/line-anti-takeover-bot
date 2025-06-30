@@ -1,5 +1,6 @@
+import os
 from flask import Flask
-from src.routes.webhook import webhook_bp
+from src.webhook import webhook_bp
 
 app = Flask(__name__)
 app.register_blueprint(webhook_bp)
@@ -9,4 +10,5 @@ def home():
     return "LINE Anti-Takeover Bot is running."
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
+    port = int(os.environ.get("PORT", 5000))  # ⚠️ 自動抓平台指定的 port
+    app.run(host="0.0.0.0", port=port)
