@@ -14,7 +14,7 @@ ADMIN_USER_IDS = ["U27bdcfedc1a0d11770345793882688c6"]  # 若有多位可擴充�
 LOG_DIR = "./logs"
 os.makedirs(LOG_DIR, exist_ok=True)
 
-@webhook_bp.route("/", methods=["POST"])
+@webhook_bp.route("/callback", methods=["POST"])
 def callback():
     signature = request.headers.get("X-Line-Signature")
     body = request.get_data(as_text=True)
@@ -78,6 +78,6 @@ from flask import Blueprint, request
 
 webhook_bp = Blueprint("webhook", __name__)
 
-@webhook_bp.route("/", methods=["POST"])
+@webhook_bp.route("/callback", methods=["POST"])
 def webhook():
     return "OK", 200
