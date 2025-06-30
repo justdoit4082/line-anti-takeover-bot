@@ -2,7 +2,7 @@ from flask import Flask
 from src.routes.webhook import webhook_bp  # 匯入 blueprint
 
 app = Flask(__name__)
-app.register_blueprint(webhook_bp, url_prefix="/webhook")  # 註冊 webhook 路由
+app.register_blueprint(webhook_bp)  # 註冊 webhook 路由
 
 # 新增首頁路由，避免根目錄回傳 404
 @app.route("/")
