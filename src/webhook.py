@@ -16,11 +16,26 @@ ADMIN_USER_IDS = ["U27bdcfedc1a0d11770345793882688c6"]
 
 LOG_DIR = "./logs"
 os.makedirs(LOG_DIR, exist_ok=True)
-# 嘗試踢人
-try:
-    line_bot_api.kickout(event.source.group_id, kicker_user_id)
-except Exception as e:
-    print(f"無法踢出使用者：{e}")
+ADMIN_USER_IDS = ["U27bdcfedc1a0d11770345793882688c6"]  # 你是管理員
+
+@handler.add(MemberLeftEvent)
+def handle_member_left(event):
+    left_user_id = event.left.user_id  # 被踢出的人
+    kicker_user_id = get_kicker_id(event.source.group_id)  # 這是你自訂函數，需自己記錄最後發出踢人訊息者
+
+    # 發送通知
+    line_bot_api.reply_message(
+        event.reply_token,
+        TextSendMessage(text=f"⚠️ 有成員從群組離開或被踢出：\n{left_user_id}\n由：\n{kicker_user_id}")
+    )
+
+    # 如果踢人者不是管理員，將其移出群組
+    if kicker_user_id not in ADMIN_USER_IDS:
+        try:
+            line_bot_api.kickout(event.source.group_id, kicker_user_id)
+            print(f"已將未授權踢人者 {kicker_user_id} 移出群組")
+        except Exception as e:
+            print(f"踢出失敗：{e}")
 
 @webhook_bp.route("/", methods=["POST"])
 def callback():
