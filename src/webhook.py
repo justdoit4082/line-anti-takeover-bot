@@ -73,3 +73,11 @@ def handle_member_left(event):
                     print(f"通知失敗: {e}")
     except Exception as e:
         print(f"處理成員離開事件時出錯：{e}")
+
+from flask import Blueprint, request
+
+webhook_bp = Blueprint("webhook", __name__)
+
+@webhook_bp.route("/", methods=["POST"])
+def webhook():
+    return "OK", 200
