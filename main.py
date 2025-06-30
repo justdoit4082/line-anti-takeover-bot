@@ -3,7 +3,7 @@ from flask import Flask
 from src.webhook import webhook_bp
 
 app = Flask(__name__)
-app.register_blueprint(webhook_bp, url_prefix="/callback")
+app.register_blueprint(webhook_bp, url_prefix="/webhook")
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 10000))
