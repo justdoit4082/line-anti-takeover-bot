@@ -5,7 +5,7 @@ from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage, MemberLeftEvent
 from datetime import datetime
 
-webhook_bp = Blueprint("webhook", __name__)  # ✅ 只保留這一個 blueprint 宣告
+webhook_bp = Blueprint("webhook", __name__, url_prefix="/callback")
 
 line_bot_api = LineBotApi(os.getenv("LINE_CHANNEL_ACCESS_TOKEN"))
 handler = WebhookHandler(os.getenv("LINE_CHANNEL_SECRET"))
@@ -14,7 +14,7 @@ ADMIN_USER_IDS = ["U27bdcfedc1a0d11770345793882688c6"]
 LOG_DIR = "./logs"
 os.makedirs(LOG_DIR, exist_ok=True)
 
-@webhook_bp.route("/callback", methods=["POST"])  # ✅ 正確路由
+@webhook_bp.route("/", methods=["POST"])
 def callback():
     signature = request.headers.get("X-Line-Signature")
     body = request.get_data(as_text=True)
