@@ -5,7 +5,8 @@ from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage, MemberLeftEvent
 from datetime import datetime
 
-webhook_bp = Blueprint("webhook", __name__, url_prefix="/callback")
+webhook_bp = Blueprint('webhook', __name__, url_prefix="/callback", strict_slashes=False)
+
 
 line_bot_api = LineBotApi(os.getenv("LINE_CHANNEL_ACCESS_TOKEN"))
 handler = WebhookHandler(os.getenv("LINE_CHANNEL_SECRET"))
