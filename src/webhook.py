@@ -4,6 +4,12 @@ from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, TextMessage, TextSendMessage, MemberLeftEvent
 from datetime import datetime
+from linebot import LineBotApi
+# 嘗試踢人
+try:
+    line_bot_api.kickout(event.source.group_id, kicker_user_id)
+except Exception as e:
+    print(f"無法踢出使用者：{e}")
 
 webhook_bp = Blueprint('webhook', __name__, url_prefix="/callback", strict_slashes=False)
 
