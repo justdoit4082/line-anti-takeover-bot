@@ -9,7 +9,6 @@ app.register_blueprint(webhook_bp)
 def home():
     return "LINE Anti-Takeover Bot is running."
 
-
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 10000))  # Render 可接受你指定 10000
     app.run(host="0.0.0.0", port=port)
